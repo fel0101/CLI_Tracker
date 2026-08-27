@@ -1,4 +1,4 @@
-# CLI_Tracker
+# task_tracker
 Projeto de aprendizado, feito em python para aprendizado inicial das funções e sintaxe da linguagem.
  Tarefa CLI
 
