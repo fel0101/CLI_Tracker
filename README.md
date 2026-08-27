@@ -196,3 +196,5 @@ Esta é a parte que **conecta tudo**: lê o que foi digitado no terminal (`sys.a
 - Adicionar testes automatizados
 - Permitir editar o status junto com a descrição no comando `atualizar`
 - Empacotar o script para ser chamado como `tarefa-cli` diretamente, sem precisar digitar `python` antes
+
+- https://github.com/fel0101/CLI_Tracker/blob/main/código%20da%20atividade
