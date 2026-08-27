@@ -1,0 +1,151 @@
+import sys
+import json
+import os
+from datetime import datetime
+
+def carregar_tarefas():
+   
+    if os.path.exists("tasks.json"):
+        with open("tasks.json", "r") as arquivo:
+            tarefas = json.load(arquivo)
+            return tarefas
+    else:
+        return []
+    
+def salvar_tarefas(tarefas):
+    with open("tasks.json", "w") as arquivo:
+        json.dump(tarefas, arquivo)
+        
+
+def adicionar_tarefa(argumentos_extras):
+    if len(argumentos_extras) == 0:
+            print("Descrição da tarefa não fornecida.")
+            return
+    tarefas = carregar_tarefas()
+    descricao = argumentos_extras[0] 
+    if len(tarefas) == 0:
+        novo_id = 1 
+    else:
+        novo_id = tarefas[-1]["id"] + 1 
+    agora = datetime.now().isoformat() 
+
+    tarefa = {
+        "id": novo_id,
+        "description": descricao,
+        "status": "todo",
+        "createdAt": agora,
+        "updatedAt": agora,
+    }
+    tarefas.append(tarefa)
+    salvar_tarefas(tarefas)
+    print(f"Tarefa adicionada com sucesso: (Id: {novo_id})")
+
+def listar_tarefas(argumentos_extras):
+        tarefas = carregar_tarefas()
+
+        if len(argumentos_extras) >0:
+            filtro = argumentos_extras[0]
+        else:
+            filtro = None
+        for tarefa in tarefas:
+            if filtro is None or tarefa["status"] == filtro:
+             print(f"ID: {tarefa['id']}", f"Descrição: {tarefa['description']}", f"Status: {tarefa['status']}", f"Criado em: {tarefa['createdAt']}", f"Atualizaado em: {tarefa['updatedAt']}", sep="\n")
+
+def mark_in_progress(argumentos_extras):
+    if len(argumentos_extras) == 0:
+        print("ID da tarefa não fornecida.")
+        return
+    tarefas = carregar_tarefas()
+    try:
+        id_tarefa = int(argumentos_extras[0])  
+    except ValueError:
+        print("ID da tarefa inválido. Certifique-se de fornecer um número inteiro.")
+        return
+    for tarefa in tarefas:
+        if tarefa["id"] == id_tarefa:
+            tarefa["status"] = "in-progress"
+            tarefa["updatedAt"] = datetime.now().isoformat()  
+            salvar_tarefas(tarefas)
+            print(f"Tarefa com ID {id_tarefa} marcada como 'in-progress'.")
+            return
+    print(f"Tarefa com ID {id_tarefa} não encontrada.")
+
+def mark_done(argumentos_extras):
+    if len(argumentos_extras) == 0:
+        print("ID da tarefa não fornecida.")
+        return
+    tarefas = carregar_tarefas()
+    try:
+        id_tarefa = int(argumentos_extras[0])  
+    except ValueError:
+        print("ID da tarefa inválido. Certifique-se de fornecer um número inteiro.")
+        return
+    for tarefa in tarefas:
+        if tarefa["id"] == id_tarefa:
+            tarefa["status"] = "done"
+            tarefa["updatedAt"] = datetime.now().isoformat()    
+            salvar_tarefas(tarefas)
+            print(f"Tarefa com ID {id_tarefa} marcada como 'done'.")
+            return
+    print(f"Tarefa com ID {id_tarefa} não encontrada.")   
+
+def atualizar_tarefa(argumentos_extras):
+    if len(argumentos_extras) < 2:
+        print("ID da tarefa ou nova descrição não fornecida.")
+        return
+    tarefas = carregar_tarefas() 
+    try:
+        id_tarefa = int(argumentos_extras[0])  
+    except ValueError:
+        print("ID da tarefa inválido. Certifique-se de fornecer um número inteiro.")
+        return
+    nova_descricao = argumentos_extras[1]  
+    for tarefa in tarefas:
+        if tarefa["id"] == id_tarefa:
+            tarefa["description"] = nova_descricao
+            tarefa["updatedAt"] = datetime.now().isoformat()  
+            salvar_tarefas(tarefas)
+            print(f"Tarefa com ID {id_tarefa} atualizada com sucesso.")
+            return
+    print(f"Tarefa com ID {id_tarefa} não encontrada.")
+
+def deletar_tarefa(argumentos_extras):
+    if len(argumentos_extras) == 0:
+        print("ID da tarefa não fornecida.")
+        return
+    tarefas = carregar_tarefas()
+    try:
+        id_tarefa = int(argumentos_extras[0])  
+    except ValueError:
+        print("ID da tarefa inválido. Certifique-se de fornecer um número inteiro.")
+        return
+    for tarefa in tarefas:
+        if tarefa["id"] == id_tarefa:
+            tarefas.remove(tarefa)
+            salvar_tarefas(tarefas)
+            print(f"Tarefa com ID {id_tarefa} deletada com sucesso.")
+            return
+    print(f"Tarefa com ID {id_tarefa} não encontrada")
+
+quantidade = len(sys.argv) 
+
+if quantidade == 1:
+     print("Nenhum comando fornecido.")
+else:
+    comando = sys.argv[1] 
+    argumentos_extras = sys.argv[2:] 
+
+    if comando == "adicionar":
+        adicionar_tarefa(argumentos_extras)  
+    elif comando == "listar": 
+         listar_tarefas(argumentos_extras) 
+    elif comando == "mark-in-progress":
+        mark_in_progress(argumentos_extras)
+    elif comando == "mark-done":
+        mark_done(argumentos_extras)
+    elif comando == "atualizar":
+        atualizar_tarefa(argumentos_extras)
+    elif comando == "deletar":
+        deletar_tarefa(argumentos_extras)
+    else:
+         print(f"Comando '{comando}' não reconhecido") 
